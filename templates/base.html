@@ -109,6 +109,15 @@
         document.addEventListener('click', () => {
             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
         });
+
+        {% if messages %}
+            {% for message in messages %}
+                Toast.fire({
+                    icon: '{{ message.tags }}' === 'error' ? 'error' : 'success',
+                    title: '{{ message }}'
+                });
+            {% endfor %}
+        {% endif %}
     </script>
     {% endblock %}
     {% block extra_js %}{% endblock %}
