@@ -1,3 +1,5 @@
+from urllib import response
+
 import pytest
 from django.urls import reverse 
 from apps.empresa.models import Empresa
@@ -26,7 +28,8 @@ def test_listar_empresas(client):
         certificado_digital="certificado.pfx",
         senha_certificado="senha123",
         telefone="(11) 1234-5678",
-        email="example@example.com.br"
+        email="example@example.com.br",
+        tipo_empresa='MATRIZ',
     )
     response = client.get(reverse('empresa:listar_empresas'))
     assert response.status_code == 200
@@ -53,9 +56,11 @@ def test_cadastrar_empresa(client):
         'moeda_padrao': 'BRL',
         'senha_certificado': 'senha123',
         'telefone': '(11) 1234-5678',
-        'email': 'example@example.com.br'
+        'email': 'example@example.com.br',
+        'tipo_empresa': 'MATRIZ',
     }
-    response = client.post(reverse('empresa:cadastrar_empresa'), data=data)
+    response = client.post(reverse('empresa:cadastrar_empresa'), data=data)   
+
     assert response.status_code == 302
     assert Empresa.objects.count() == 1
 
@@ -82,7 +87,8 @@ def test_editar_empresa(client):
         certificado_digital="certificado.pfx",
         senha_certificado="senha123",
         telefone="(11) 1234-5678",
-        email="example@example.com.br"
+        email="example@example.com.br",
+        tipo_empresa='MATRIZ',
     )
     data = {
         "razao_social": "Empresa Editada LTDA",
@@ -103,10 +109,12 @@ def test_editar_empresa(client):
         'moeda_padrao': 'BRL',
         'senha_certificado': 'senha123',
         'telefone': '(11) 1234-5678',
-        'email': 'example@example.com.br'
+        'email': 'example@example.com.br',
+        'tipo_empresa': 'MATRIZ',
     }
 
     response = client.post(reverse('empresa:editar_empresa', kwargs={'id': empresa.id}), data=data)
+   
     assert response.status_code == 302
     empresa.refresh_from_db()
     assert empresa.razao_social == "Empresa Editada LTDA"  

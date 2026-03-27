@@ -104,7 +104,8 @@
                     <label for="logradouro" class="block text-gray-700 font-medium mb-1">Logradouro *</label>
                     <input type="text" name="logradouro" id="logradouro" required
                         value="{{ data.logradouro }}"
-                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
+                        readonly style="background-color: #e9ecef;">
                 </div>
                 <div>
                     <label for="numero" class="block text-gray-700 font-medium mb-1">Número *</label>
@@ -124,19 +125,22 @@
                     <label for="bairro" class="block text-gray-700 font-medium mb-1">Bairro *</label>
                     <input type="text" name="bairro" id="bairro" required
                         value="{{ data.bairro }}"
-                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
+                        readonly style="background-color: #e9ecef;">
                 </div>
                 <div>
                     <label for="cidade" class="block text-gray-700 font-medium mb-1">Cidade *</label>
                     <input type="text" name="cidade" id="cidade" required
-                        value="{{ data.cidade }}"
-                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
+                        value="{{ data.cidade }}" 
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400" 
+                        readonly style="background-color: #e9ecef;">
                 </div>
                 <div>
                     <label for="estado" class="block text-gray-700 font-medium mb-1">Estado (UF) *</label>
                     <input type="text" name="estado" id="estado" maxlength="2" required
                         value="{{ data.estado }}"
-                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
+                        readonly style="background-color: #e9ecef;">
                 </div>
             </div>
             <div class="mt-4">

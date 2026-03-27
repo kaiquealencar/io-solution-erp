@@ -1,4 +1,3 @@
-// empresa/static/js/busca_cep.js
 document.addEventListener('DOMContentLoaded', function() {
     const cepInput = document.getElementById('cep');
     
@@ -19,15 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         cidadeInput.value = data.localidade || '';
                         estadoInput.value = data.uf || '';
 
-                        logradouroInput.readOnly = true;
-                        bairroInput.readOnly = true;
-                        cidadeInput.readOnly = true;
-                        estadoInput.readOnly = true;
-                        
-                        logradouroInput.style.backgroundColor = '#e9ecef';
-                        bairroInput.style.backgroundColor = '#e9ecef';
-                        cidadeInput.style.backgroundColor = '#e9ecef';
-                        estadoInput.style.backgroundColor = '#e9ecef';
+                      
 
 
                         document.getElementById('numero').focus();
@@ -39,10 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Chama ao sair do campo CEP
     cepInput.addEventListener('blur', buscarEndereco);
 
-    // Opcional: busca ao apertar Enter no campo CEP
     cepInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
