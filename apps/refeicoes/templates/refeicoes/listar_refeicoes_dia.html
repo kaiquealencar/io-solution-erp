@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Refeições do Dia{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto mt-10">
+    <form method="GET" class="mb-6 flex items-center gap-4">
+        <input 
+            type="month" 
+            name="mes" 
+            value="{{ mes }}"
+            class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
+        >
+        <select name="quinzena"
+            class="border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
+
+            <option value="0" {% if quinzena == '0' %}selected{% endif %}>
+                Automático
+            </option>
+
+            <option value="1" {% if quinzena == '1' %}selected{% endif %}>
+                1ª Quinzena
+            </option>
+
+            <option value="2" {% if quinzena == '2' %}selected{% endif %}>
+                2ª Quinzena
+            </option>        
+        </select>
+
+        <button type="submit"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+            Filtrar
+        </button>
+        <a href="{% url 'refeicoes:listar_refeicoes_dia' %}" 
+           class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+            Mês Atual
+        </a>
+
+    </form>
+
+   <h1 class="text-2xl font-bold text-green-600 mb-6">
+    {% if data %}
+        Refeições de {{ data|date:"d/m/Y" }}
+    {% else %}
+        Refeições de {{ inicio|date:"d/m" }} até {{ fim|date:"d/m" }}
+    {% endif %}
+</h1>
+    <div class="flex justify-end mb-4">
+        <a href="{% url 'refeicoes:cadastrar_refeicao_dia' %}" 
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-300">
+            Cadastrar Nova Refeição
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+            <thead class="bg-green-600 text-white">
+                <tr>
+                    <th class="py-3 px-4 text-left">Data</th>
+                    <th class="py-3 px-4 text-left">Dia da Semana</th>
+                    <th class="py-3 px-4 text-left">Refeição</th>
+                    <th class="py-3 px-4 text-left">Tipo</th>
+                    <th class="py-3 px-4 text-center">Quantidade</th>
+                    <th class="py-3 px-4 text-center">Ações</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-200">
+                {% for item in refeicoes_dia %}
+                <tr class="hover:bg-gray-50">
+                    
+                    <td class="py-3 px-4">
+                        {{ item.data|date:"d/m/Y" }}
+                    </td>
+
+                    <td class="py-3 px-4">
+                        {{ item.data|date:"l"|capfirst }}
+                    </td>
+
+                    <td class="py-3 px-4">
+                        {{ item.refeicao.nome }}
+                    </td>       
+
+                    <td class="py-3 px-4">
+                        {{ item.refeicao.get_tipo_display }}
+                    </td>
+
+                    <td class="py-3 px-4 text-center font-semibold">
+                        {{ item.quantidade }}
+                    </td>
+                    <td class="py-3 px-4 text-center space-x-2">
+                        <a href="{% url 'refeicoes:editar_refeicao_dia' item.id %}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition">
+                            Editar
+                        </a>                 
+                        <a href="#" 
+                            onclick="confirmarExclusao(event, '{% url 'refeicoes:excluir_refeicao_dia' item.id %}')" 
+                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition duration-150 inline-block">
+                            Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="py-4 text-center text-gray-500">
+                        Nenhuma refeição lançada para esta data.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

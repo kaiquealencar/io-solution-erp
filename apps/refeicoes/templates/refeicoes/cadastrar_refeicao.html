@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if refeicao %}Editar Refeição{% else %}Cadastrar Refeição{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-green-600 mb-6 text-center">
+        {% if refeicao %}Editar Refeição{% else %}Cadastrar Refeição{% endif %}
+    </h1>
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+
+        <div>
+            <label for="nome" class="block text-gray-700 font-medium mb-1">Nome</label>
+            <input 
+                type="text" 
+                name="nome" 
+                id="nome"
+                placeholder="Digite o nome da refeição"
+                value="{{ refeicao.nome|default:'' }}"
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+        </div>
+
+        <div>
+            <label for="tipo" class="block text-gray-700 font-medium mb-1">Tipo</label>
+            <select 
+                name="tipo" 
+                id="tipo"
+                class="w-full border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+                <option value="">-- Selecione o tipo --</option>
+                <option value="PACIENTE_ACOMPANHANTE" {% if refeicao.tipo == 'PACIENTE_ACOMPANHANTE' %}selected{% endif %}>Paciente e Acompanhante</option>
+                <option value="PACIENTE_DIETA_LIQUIDA" {% if refeicao.tipo == 'PACIENTE_DIETA_LIQUIDA' %}selected{% endif %}>Paciente Dieta Líquida</option>
+                <option value="PACIENTE_BEBIDA" {% if refeicao.tipo == 'PACIENTE_BEBIDA' %}selected{% endif %}>Paciente Bebida</option>
+                <option value="FUNCIONARIOS" {% if refeicao.tipo == 'FUNCIONARIOS' %}selected{% endif %}>Funcionários</option>
+            </select>
+        </div>
+
+        <div class="text-center">
+            <button 
+                type="submit"
+                class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition"
+            >
+                {% if refeicao %}Atualizar{% else %}Cadastrar{% endif %}
+            </button>
+
+            <a href="{% url 'refeicoes:listar_refeicoes' %}" class="block mt-2 text-sm text-gray-600 hover:text-gray-800 transition">
+                Voltar para a lista de refeições
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

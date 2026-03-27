@@ -1,110 +1,113 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Nome da Empresa{% endblock %}</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sis Nutrindo{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Garante que os dropdowns não fiquem cortados ou atrás de outros elementos */
+        .dropdown-menu { z-index: 9999 !important; }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
 
-    <header class="bg-white shadow-md">
+    <header class="bg-white shadow-md relative">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             
             <h1 class="text-xl font-bold text-green-600">
-                {{ empresa.nome_fantasia }}
+                <a href="/">{{ empresa.nome_fantasia|default:"Sis Nutrindo" }}</a>
             </h1>
 
-            <nav class="flex items-center gap-4">
-
-                <a href="/" class="text-gray-700 hover:text-green-600 transition">
+            <nav class="flex items-center gap-6">
+                <a href="/" class="text-gray-700 hover:text-green-600 transition font-medium">
                     Home
                 </a>
 
                 <div class="relative">
-                    <button 
-                        id="menuButton"
-                        class="text-gray-700 hover:text-green-600 transition font-medium flex items-center gap-1"
-                    >
-                        Sistema
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
+                    <button id="btnRefeicoes" class="text-gray-700 hover:text-green-600 transition font-medium flex items-center gap-1">
+                        Refeições
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
-
-                    <div 
-                        id="menuDropdown"
-                        class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg hidden"
-                    >
-                        <a href="{% url 'usuarios:lista_usuarios' %}" class="block px-4 py-2 text-gray-700 hover:bg-green-100">Usuários</a>
-                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-green-100">Relatórios</a>
-                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-green-100">Configurações</a>
-                        <a href="{% url 'empresa:listar_empresas' %}" class="block px-4 py-2 text-gray-700 hover:bg-green-100">Empresas</a>
+                    <div id="dropdownRefeicoes" class="dropdown-menu absolute right-0 mt-2 w-56 bg-white border rounded shadow-lg hidden overflow-hidden">
+                        <a href="{% url 'refeicoes:listar_refeicoes' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50">Base de Refeições</a>
+                        <a href="{% url 'refeicoes:listar_refeicoes_dia' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 border-t">Lançamentos do Dia</a>
                     </div>
-                </div>                
+                </div>
 
-                {% if request.user.is_authenticated %}
-                    <span class="text-sm text-gray-600">
-                        Olá, {{ request.user.email }}
-                    </span>
-                    <a href="#" class="text-red-500 hover:underline text-sm">
-                        Sair
-                    </a>
-                {% else %}
-                    <a href="#" class="text-green-600 hover:underline text-sm">
-                        Login
-                    </a>
-                {% endif %}
+                <div class="relative">
+                    <button id="btnSistema" class="text-gray-700 hover:text-green-600 transition font-medium flex items-center gap-1">
+                        Sistema
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div id="dropdownSistema" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg hidden overflow-hidden">
+                        <a href="{% url 'usuarios:lista_usuarios' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50">Usuários</a>
+                        <a href="{% url 'empresa:listar_empresas' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50">Empresas</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 border-t">Relatórios</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50">Configurações</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 ml-4 border-l pl-6 border-gray-200">
+                    {% if request.user.is_authenticated %}
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs text-gray-500 italic">Usuário:</span>
+                            <span class="text-sm font-semibold text-gray-700">{{ request.user.email }}</span>
+                        </div>
+                        <a href="#" class="bg-red-50 text-red-600 px-3 py-1 rounded text-sm hover:bg-red-600 hover:text-white transition font-medium">
+                            Sair
+                        </a>
+                    {% else %}
+                        <a href="#" class="text-green-600 border border-green-600 px-4 py-1 rounded text-sm hover:bg-green-600 hover:text-white transition">
+                            Login
+                        </a>
+                    {% endif %}
+                </div>
             </nav>
-
         </div>
     </header>
 
-    {% if messages %}
-    <div class="max-w-7xl mx-auto px-4 py-4 mt-4">
-        {% for message in messages %}
-        <div 
-            class="flash-message p-4 rounded mb-2 shadow
-                {% if message.tags == 'success' %}bg-green-100 text-green-800{% endif %}
-                {% if message.tags == 'error' %}bg-red-100 text-red-800{% endif %}
-                {% if message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% endif %} "
-        >
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-
-    <script>
-        const flashes = document.querySelectorAll('.flash-message');
-        flashes.forEach(msg => {
-            setTimeout(() => {
-                msg.classList.add('opacity-0', 'transition', 'duration-700');
-                setTimeout(() => msg.remove(), 700);
-            }, 5000);
-        });
-    </script>
-    {% endif %}
-
-    <main class="max-w-7xl mx-auto px-4 py-6">
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
         {% block content %}
         {% endblock %}
     </main>
 
+    <footer class="bg-white border-t py-4 text-center text-gray-400 text-xs mt-auto">
+        &copy; 2026 Sis Nutrindo - Gestão de Refeições
+    </footer>
+
     {% block scripts_extra %}
-    <script>
-        const menuButton = document.getElementById('menuButton');
-        const menuDropdown = document.getElementById('menuDropdown');
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        
+        <script src="{% static 'js/main.js' %}"></script>
 
-        menuButton.addEventListener('click', () => {
-            menuDropdown.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!menuButton.contains(event.target) && !menuDropdown.contains(event.target)) {
-                menuDropdown.classList.add('hidden');
+        <script>
+            if (typeof setupDropdown === 'function') {
+                setupDropdown('btnRefeicoes', 'dropdownRefeicoes');
+                setupDropdown('btnSistema', 'dropdownSistema');
+            } else {
+                const toggleMenu = (btnId, menuId) => {
+                    const btn = document.getElementById(btnId);
+                    const menu = document.getElementById(menuId);
+                    if(btn && menu) {
+                        btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); });
+                        document.addEventListener('click', (e) => { if(!btn.contains(e.target)) menu.classList.add('hidden'); });
+                    }
+                };
+                toggleMenu('btnRefeicoes', 'dropdownRefeicoes');
+                toggleMenu('btnSistema', 'dropdownSistema');
             }
-        });
-    </script>
+
+            {% if messages %}
+                {% for message in messages %}
+                    Toast.fire({
+                        icon: '{{ message.tags }}' === 'error' ? 'error' : 'success',
+                        title: '{{ message }}'
+                    });
+                {% endfor %}
+            {% endif %}
+        </script>
     {% endblock %}
 
 </body>

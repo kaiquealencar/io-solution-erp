@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if refeicao_dia %}Editar{% else %}Cadastrar{% endif %} Refeição do Dia
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+
+    <h1 class="text-2xl font-bold text-green-600 mb-6 text-center">
+        {% if refeicao_dia %}Editar{% else %}Cadastrar{% endif %} Refeição do Dia
+    </h1>
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+
+        <div>
+            <label class="block text-gray-700 font-medium mb-1">Data</label>
+            <input 
+                type="date" 
+                name="data"
+                value="{{ refeicao_dia.data|date:'Y-m-d' }}"
+                required
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
+            >
+        </div>
+
+        <div>
+            <label class="block text-gray-700 font-medium mb-1">Tipo</label>
+            <select id="tipo"
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
+                
+                <option value="">-- Selecione o tipo --</option>
+                <option value="PACIENTE_ACOMPANHANTE">Paciente e Acompanhante</option>
+                <option value="PACIENTE_DIETA_LIQUIDA">Paciente Dieta Líquida</option>
+                <option value="PACIENTE_BEBIDA">Paciente Bebida</option>
+                <option value="FUNCIONARIOS">Funcionários</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-gray-700 font-medium mb-1">Refeição</label>
+            <select 
+                name="refeicao" 
+                id="refeicao"
+                required
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
+            >
+                <option value="">-- Selecione --</option>
+
+                {% for r in refeicoes %}
+                    <option value="{{ r.id }}"
+                        data-tipo="{{ r.tipo }}"
+                        {% if refeicao_dia and refeicao_dia.refeicao.id == r.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ r.nome }} ({{ r.get_tipo_display }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-gray-700 font-medium mb-1">Quantidade</label>
+            <input 
+                type="number" 
+                name="quantidade"
+                min="0"
+                value="{{ refeicao_dia.quantidade|default:'' }}"
+                required
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
+            >
+        </div>
+
+        <button type="submit"
+            class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700">
+            {% if refeicao_dia %}Atualizar{% else %}Cadastrar{% endif %}
+        </button>
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="{% url 'refeicoes:listar_refeicoes_dia' %}" class="block mt-2 text-sm text-gray-600 hover:text-gray-800 transition">
+                Voltar para a lista de refeições
+            </a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+    const tipoSelect = document.getElementById('tipo');
+    const refeicaoSelect = document.getElementById('refeicao');
+
+    function filtrarRefeicoes() {
+        const tipoSelecionado = tipoSelect.value;
+
+        Array.from(refeicaoSelect.options).forEach(option => {
+            if (!option.value) return;
+
+            if (!tipoSelecionado || option.dataset.tipo === tipoSelecionado) {
+                option.style.display = 'block';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    }
+
+    tipoSelect.addEventListener('change', function () {
+        filtrarRefeicoes();
+        refeicaoSelect.value = "";
+    });
+
+    window.addEventListener('load', function () {
+        const selecionado = refeicaoSelect.selectedOptions[0];
+
+        if (selecionado && selecionado.dataset.tipo) {
+            tipoSelect.value = selecionado.dataset.tipo;
+            filtrarRefeicoes();
+        }
+    });
+</script>
+{% endblock %}
