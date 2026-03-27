@@ -77,37 +77,33 @@
     </footer>
 
     {% block scripts_extra %}
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
-        <script src="{% static 'js/main.js' %}"></script>
+       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{% static 'js/main.js' %}"></script>
 
-        <script>
-            if (typeof setupDropdown === 'function') {
-                setupDropdown('btnRefeicoes', 'dropdownRefeicoes');
-                setupDropdown('btnSistema', 'dropdownSistema');
-            } else {
-                const toggleMenu = (btnId, menuId) => {
-                    const btn = document.getElementById(btnId);
-                    const menu = document.getElementById(menuId);
-                    if(btn && menu) {
-                        btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); });
-                        document.addEventListener('click', (e) => { if(!btn.contains(e.target)) menu.classList.add('hidden'); });
-                    }
-                };
-                toggleMenu('btnRefeicoes', 'dropdownRefeicoes');
-                toggleMenu('btnSistema', 'dropdownSistema');
-            }
-
-            {% if messages %}
-                {% for message in messages %}
-                    Toast.fire({
-                        icon: '{{ message.tags }}' === 'error' ? 'error' : 'success',
-                        title: '{{ message }}'
+    <script>
+        const toggleMenu = (btnId, menuId) => {
+            const btn = document.getElementById(btnId);
+            const menu = document.getElementById(menuId);
+            if(btn && menu) {
+                btn.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    document.querySelectorAll('.dropdown-menu').forEach(m => {
+                        if(m !== menu) m.classList.add('hidden');
                     });
-                {% endfor %}
-            {% endif %}
-        </script>
+                    menu.classList.toggle('hidden'); 
+                });
+            }
+        };
+
+        toggleMenu('btnRefeicoes', 'dropdownRefeicoes');
+        toggleMenu('btnSistema', 'dropdownSistema');
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+        });
+    </script>
     {% endblock %}
+    {% block extra_js %}{% endblock %}
 
 </body>
 </html>

@@ -17,13 +17,17 @@ class Refeicoes(models.Model):
     
 
 class RefeicaoDia(models.Model):
+    empresa = models.ForeignKey(
+        'empresa.Empresa',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     data = models.DateField()
     refeicao = models.ForeignKey(Refeicoes, on_delete=models.CASCADE, related_name='refeicoes_dia')
     quantidade = models.PositiveIntegerField(default=0) 
 
-
-    class Meta:
-        unique_together = ('data', 'refeicao')
-
+  
     def __str__(self):
         return f"{self.refeicao} - {self.data} - Quantidade: {self.quantidade}"

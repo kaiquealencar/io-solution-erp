@@ -30,6 +30,15 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     )
      
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='funcionario')
+
+    empresa = models.ForeignKey(
+        'empresa.Empresa',
+        on_delete=models.CASCADE,
+        related_name='usuarios',
+        null=True,  
+        blank=True
+    )
+
     email = models.EmailField(unique=True)
     nome = models.CharField(max_length=255, blank=True)
 
@@ -41,6 +50,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     objects = UsuarioManager()
 
     USERNAME_FIELD = 'email'       
-    REQUIRED_FIELDS = []           
+    REQUIRED_FIELDS = []        
+       
     def __str__(self):
         return self.email
