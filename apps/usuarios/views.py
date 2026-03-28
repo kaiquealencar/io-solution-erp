@@ -1,16 +1,30 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Usuario
+from apps.empresa.models import Empresa
 
 
 def cad_usuario(request):
+    empresa_ativa = Empresa.objects.filter(ativo=True).first()
+
     if request.method == 'POST':
+        email = request.POST.get("email")
+        nome = request.POST.get("nome")
+
+        if Usuario.objects.filter(email=email).exists():
+            messages.error(request, f"Já existe um usuário com o email: {email}")
+            return render(request, 'usuarios/cad_usuario.html',
+                          {'email': email, 'nome': nome, 'role': request.POST.get("role")})
+        
         usuario_data = {
             "email": request.POST.get("email"),
             "nome": request.POST.get("nome"),
             "password": request.POST.get("password"),
-            "role": request.POST.get("role")
+            "role": request.POST.get("role"),
+            "empresa": empresa_ativa
         }
+        
 
         Usuario.objects.create_user(**usuario_data)
 
@@ -28,7 +42,8 @@ def lista_usuarios(request):
 
 
 def editar_usuario(request, id):
-    usuario = get_object_or_404(Usuario, id=id)
+    usuario = get_object_or_404(Usuario, id=id)    
+    empresa_ativa = Empresa.objects.filter(ativo=True).first()
 
     if request.method == 'POST':
         usuario.email = request.POST.get("email")
@@ -39,6 +54,8 @@ def editar_usuario(request, id):
             usuario.set_password(password) 
         usuario.role = request.POST.get("role")
         usuario.is_active = ativo
+        usuario.empresa = empresa_ativa
+
 
         usuario.save()
 
@@ -53,3 +70,5 @@ def excluir_usuario(request, id):
     usuario.delete()
     messages.success(request, f"Usuário {usuario.email} excluído com sucesso!")
     return redirect('usuarios:lista_usuarios')
+
+
