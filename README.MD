@@ -21,7 +21,13 @@ Interface limpa para o cadastro e manutenção do "cardápio" base de refeiçõe
 ### 3. Lançamento Diário Dinâmico
 Formulário inteligente para registro rápido das refeições servidas no dia, com select dinâmico de tipo e refeição.
 
-![Formulário de Lançamento Diário](screenshots/cad_empresa_1.png)
+![Formulário de Lançamento Diário](screenshots/cadastro_refeicoes_dia.png)
+
+
+### 4. Cadastro de Empresas
+Formulário inteligente de cadastro de empresas, com integração ao api ViaCep para o preenchimento automático de endereço
+![Formulário de cadastro de empresa](screenshots/cad_empresa_1.png)
+
 
 ---
 
