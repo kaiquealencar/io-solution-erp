@@ -1,8 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Usuario
 from apps.empresa.models import Empresa
+from .email_validator import verificar_duplicidade_no_banco
 
 
 def cad_usuario(request):
@@ -72,3 +73,19 @@ def excluir_usuario(request, id):
     return redirect('usuarios:lista_usuarios')
 
 
+
+def validar_email(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', None)
+
+        if not email:
+            return JsonResponse({"error": "Email é obrigatório."}, status=400)
+        
+        try:
+            verificar_duplicidade_no_banco(email, 'usuarios', 'Usuario')
+            return JsonResponse({"valid": True})
+        
+        except Exception as e:
+            return JsonResponse({"valid": False, "error": str(e)}, status=200)
+    
+    return JsonResponse({"error": "Método não permitido."}, status=405)

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{% if usuario %}Editar Usuário{% else %}Cadastrar Usuário{% endif %}{% endblock %}
 
@@ -16,13 +17,14 @@
             <input 
                 type="email" 
                 name="email" 
-                id="email"
+                id="email"                
                 placeholder="Digite o email"
                 value="{{ usuario.email|default:'' }}"
                 required
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
                 
             >
+            <span id="email-msg" class="text-xs mt-1 block opacity-0 transition-opacity duration-500"></span>
         </div>
 
         <div>
@@ -89,6 +91,7 @@
 {% endblock %}
 
 {% block scripts_extra %}
+<script src="{% static 'js/email_validator.js' %}"></script>
 <script>
     const togglePassword = document.querySelector('#togglePassword');
     const passwordInput = document.querySelector('#password');
@@ -98,8 +101,6 @@
         passwordInput.setAttribute('type', type);
         this.textContent = type === 'password' ? '👁️' : '🙈';
     });
-
-    
     
 </script>
 {% endblock %}
