@@ -25,6 +25,7 @@ def test_cadastrar_usuario(client):
         "nome": "fulano",
         "password": "senha123",
         "role": "admin",
+        "is_active": "on",
         "empresa": empresa.id
     }
 
@@ -36,6 +37,7 @@ def test_cadastrar_usuario(client):
     assert usuario.email == data["email"]
     assert usuario.nome == data["nome"]
     assert usuario.role == data["role"]
+    assert usuario.is_active is True
     assert usuario.empresa.id == empresa.id
     assert usuario.check_password(data["password"])
 
@@ -49,6 +51,7 @@ def test_editar_usuario(client):
         nome="fulano",
         password="senha123",
         role="admin",
+        is_active=True,
         empresa=empresa
     )
 
@@ -56,7 +59,8 @@ def test_editar_usuario(client):
         "email": "updated@example.com.br",
         "nome": "ciclano",
         "password": "nova_senha123",
-        "role": "user"
+        "role": "user",
+        "is_active": "on",
     }
 
     response = client.post(reverse("usuarios:editar_usuario", kwargs={"id": usuario.id}), data=data)
@@ -67,6 +71,7 @@ def test_editar_usuario(client):
     assert usuario.email == data["email"]
     assert usuario.nome == data["nome"]
     assert usuario.role == data["role"]
+    assert usuario.is_active is True
     assert usuario.check_password(data["password"])  
 
 

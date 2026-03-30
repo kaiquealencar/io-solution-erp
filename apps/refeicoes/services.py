@@ -1,7 +1,6 @@
 
 import calendar
 from datetime import date
-from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django.db import transaction
 

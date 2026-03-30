@@ -3,43 +3,38 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Usuario
 from apps.empresa.models import Empresa
+from .services import salvar_usuario
 from .email_validator import verificar_duplicidade_no_banco
+
+
+def lista_usuarios(request):
+    usuarios = Usuario.objects.only("nome", "email", "role", "is_active").order_by('-date_joined')
+    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
 
 
 def cad_usuario(request):
     empresa_ativa = Empresa.objects.filter(ativo=True).first()
 
     if request.method == 'POST':
-        email = request.POST.get("email")
-        nome = request.POST.get("nome")
+        fields_form = _get_form_field(request)      
+       
+        try:        
+            salvar_usuario(**fields_form, empresa=empresa_ativa)                        
+            messages.success(request, f"Usuário: {fields_form['email']} cadastrado com sucesso!")
+            
+            return redirect('usuarios:lista_usuarios')
+        except ValueError as e:
+            messages.error(request, str(e))
 
-        if Usuario.objects.filter(email=email).exists():
-            messages.error(request, f"Já existe um usuário com o email: {email}")
             return render(request, 'usuarios/cad_usuario.html',
-                          {'email': email, 'nome': nome, 'role': request.POST.get("role")})
-        
-        usuario_data = {
-            "email": request.POST.get("email"),
-            "nome": request.POST.get("nome"),
-            "password": request.POST.get("password"),
-            "role": request.POST.get("role"),
-            "empresa": empresa_ativa
-        }
-        
+                          {'email': fields_form['email'],
+                           'nome': fields_form['nome'],
+                            'role': fields_form['role'], 
+                            'ativo': fields_form['ativo']}
+                    )
 
-        Usuario.objects.create_user(**usuario_data)
-
-        messages.success(request, f"Usuário: {usuario_data['email']} cadastrado com sucesso!")
-        return redirect('usuarios:lista_usuarios')
 
     return render(request, 'usuarios/cad_usuario.html')
-
-
-
-def lista_usuarios(request):
-    usuarios = Usuario.objects.all()
-    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
-
 
 
 def editar_usuario(request, id):
@@ -47,21 +42,16 @@ def editar_usuario(request, id):
     empresa_ativa = Empresa.objects.filter(ativo=True).first()
 
     if request.method == 'POST':
-        usuario.email = request.POST.get("email")
-        usuario.nome = request.POST.get("nome")
-        password = request.POST.get("password")
-        ativo = request.POST.get("is_active") == 'on'
-        if password:
-            usuario.set_password(password) 
-        usuario.role = request.POST.get("role")
-        usuario.is_active = ativo
-        usuario.empresa = empresa_ativa
+        fields_form = _get_form_field(request)           
+              
+        try:
+            salvar_usuario(**fields_form, empresa=empresa_ativa, usuario_id=usuario.id)
+            messages.success(request, f"Usuário {usuario.email} atualizado com sucesso!")
+            return redirect('usuarios:lista_usuarios')
+        except ValueError as e:
+            messages.error(request, str(e))
+            return render(request, 'usuarios/cad_usuario.html', {'usuario': usuario, **fields_form})
 
-
-        usuario.save()
-
-        messages.success(request, f"Usuário {usuario.email} atualizado com sucesso!")
-        return redirect('usuarios:lista_usuarios')
 
     return render(request, 'usuarios/cad_usuario.html', {'usuario': usuario})
 
@@ -89,3 +79,20 @@ def validar_email(request):
             return JsonResponse({"valid": False, "error": str(e)}, status=200)
     
     return JsonResponse({"error": "Método não permitido."}, status=405)
+
+def _get_form_field(request):
+    email = request.POST.get("email")    
+    nome = request.POST.get("nome")
+    password = request.POST.get("password")
+    role = request.POST.get("role")
+    val = request.POST.get("is_active")
+    ativo = val in ['on', 'True', True]
+
+
+    return {
+        "email": email,
+        "nome": nome,
+        "password": password,
+        "role": role,
+        "ativo": ativo
+    }

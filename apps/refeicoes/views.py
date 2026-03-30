@@ -93,7 +93,7 @@ def editar_refeicao_dia(request, id):
         quantidade = request.POST.get('quantidade')
 
         try:
-            salvar_refeicao_dia(request, refeicao_id, data, quantidade, id)
+            salvar_refeicao_dia(refeicao_id, data, quantidade, id)
             messages.success(request, 'Refeição do dia atualizada com sucesso!')
             return redirect('refeicoes:listar_refeicoes_dia')
         except ValueError as e:
