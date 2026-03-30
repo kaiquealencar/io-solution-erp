@@ -24,7 +24,7 @@ class RefeicaoDia(models.Model):
         blank=True
     )
 
-    data = models.DateField()
+    data = models.DateField(db_index=True)
     refeicao = models.ForeignKey(Refeicoes, on_delete=models.CASCADE, related_name='refeicoes_dia')
     quantidade = models.PositiveIntegerField(default=0) 
 
