@@ -26,11 +26,10 @@
         </div>
 
         <div>
-            <label class="block text-gray-700 font-medium mb-1">Tipo</label>
-            <select id="tipo"
+            <label class="block text-gray-700 font-medium mb-1">Tipo de Público (Filtro)</label>
+            <select id="tipo" name="tipo_filtro"
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
-                
-                <option value="">-- Selecione o tipo --</option>
+                <option value="">-- Todos os tipos --</option>
                 <option value="PACIENTE_ACOMPANHANTE">Paciente e Acompanhante</option>
                 <option value="PACIENTE_DIETA_LIQUIDA">Paciente Dieta Líquida</option>
                 <option value="PACIENTE_BEBIDA">Paciente Bebida</option>
@@ -46,14 +45,11 @@
                 required
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
             >
-                <option value="">-- Selecione --</option>
-
-                {% for r in refeicoes %}
+                <option value="">-- Selecione a refeição --</option>
+                {% for r in refeicoes %} 
                     <option value="{{ r.id }}"
                         data-tipo="{{ r.tipo }}"
-                        {% if refeicao_dia and refeicao_dia.refeicao.id == r.id %}
-                            selected
-                        {% endif %}
+                        {% if refeicao_dia and refeicao_dia.refeicao.id == r.id %}selected{% endif %}
                     >
                         {{ r.nome }} ({{ r.get_tipo_display }})
                     </option>
@@ -66,7 +62,7 @@
             <input 
                 type="number" 
                 name="quantidade"
-                min="0"
+                min="1" 
                 value="{{ refeicao_dia.quantidade|default:'' }}"
                 required
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
@@ -74,15 +70,15 @@
         </div>
 
         <button type="submit"
-            class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700">
+            class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700 transition">
             {% if refeicao_dia %}Atualizar{% else %}Cadastrar{% endif %}
         </button>
-        <div style="text-align: center; margin-top: 10px;">
-            <a href="{% url 'refeicoes:listar_refeicoes_dia' %}" class="block mt-2 text-sm text-gray-600 hover:text-gray-800 transition">
-                Voltar para a lista de refeições
+
+        <div class="text-center mt-4">
+            <a href="{% url 'refeicoes:listar_refeicoes_dia' %}" class="text-sm text-gray-600 hover:text-gray-800 transition">
+                ← Voltar para a lista
             </a>
         </div>
-
     </form>
 </div>
 {% endblock %}
@@ -91,34 +87,37 @@
 <script>
     const tipoSelect = document.getElementById('tipo');
     const refeicaoSelect = document.getElementById('refeicao');
+    const todasOpcoes = Array.from(refeicaoSelect.options);
 
     function filtrarRefeicoes() {
         const tipoSelecionado = tipoSelect.value;
+        const valorAtual = refeicaoSelect.value;
 
-        Array.from(refeicaoSelect.options).forEach(option => {
-            if (!option.value) return;
-
-            if (!tipoSelecionado || option.dataset.tipo === tipoSelecionado) {
-                option.style.display = 'block';
-            } else {
-                option.style.display = 'none';
+        refeicaoSelect.innerHTML = '';
+        
+        todasOpcoes.forEach(option => {
+            if (!option.value || !tipoSelecionado || option.dataset.tipo === tipoSelecionado) {
+                refeicaoSelect.appendChild(option);
             }
         });
+
+        refeicaoSelect.value = valorAtual;
     }
 
-    tipoSelect.addEventListener('change', function () {
+    tipoSelect.addEventListener('change', function() {
         filtrarRefeicoes();
-        refeicaoSelect.value = "";
+        const selectedOption = refeicaoSelect.options[refeicaoSelect.selectedIndex];
+        if (selectedOption && selectedOption.value && selectedOption.dataset.tipo !== tipoSelect.value && tipoSelect.value !== "") {
+            refeicaoSelect.value = "";
+        }
     });
 
-    window.addEventListener('load', function () {
-        const selecionado = refeicaoSelect.selectedOptions[0];
-
+    window.addEventListener('DOMContentLoaded', function () {
+        const selecionado = refeicaoSelect.querySelector('option[selected]');
         if (selecionado && selecionado.dataset.tipo) {
             tipoSelect.value = selecionado.dataset.tipo;
             filtrarRefeicoes();
         }
     });
-    
 </script>
 {% endblock %}

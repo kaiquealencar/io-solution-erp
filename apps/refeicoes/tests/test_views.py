@@ -55,14 +55,13 @@ def test_cadastrar_refeicao_dia(client):
     refeicao = Refeicoes.objects.create(nome="Almoço", tipo="FUNCIONARIOS")
     
     data = {
-        "data": "2026-03-27",      # Data no formato ISO
-        "refeicao": str(refeicao.id), # O ID deve ser passado como string
-        "quantidade": "10"         # Verifique se este campo aceita números no Model
+        "data": "2026-03-27",     
+        "refeicao": str(refeicao.id),
+        "quantidade": "10"         
     }
     
     response = client.post(reverse("refeicoes:cadastrar_refeicao_dia"), data)
     
-    # Se falhar, o print abaixo mostrará a mensagem de erro no console (use pytest -s)
     if response.status_code != 302:
         print(response.content.decode()) 
 
@@ -77,7 +76,7 @@ def test_editar_refeicao_dia(client):
     data = {
         "refeicao": refeicao.id,
         "data": "2024-06-02",
-        "quantidade": "2" # ADICIONE ISSO
+        "quantidade": "2" 
     }
     response = client.post(reverse("refeicoes:editar_refeicao_dia", args=[refeicao_dia.id]), data)
     assert response.status_code == 302
@@ -96,7 +95,6 @@ def test_listar_refeicoes_dia(client):
     RefeicaoDia.objects.create(refeicao=refeicao, data="2024-06-01", quantidade=1)
     RefeicaoDia.objects.create(refeicao=refeicao, data="2024-06-02", quantidade=1)
 
-    # Forçar o mês correto na URL para o filtro encontrar os dados
     response = client.get(reverse("refeicoes:listar_refeicoes_dia"), {"mes": "2024-06"})
     
     assert response.status_code == 200

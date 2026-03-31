@@ -1,3 +1,5 @@
+from urllib import response
+
 import pytest
 from django.urls import reverse 
 from apps.usuarios.models import Usuario
@@ -59,8 +61,9 @@ def test_editar_usuario(client):
         "email": "updated@example.com.br",
         "nome": "ciclano",
         "password": "nova_senha123",
-        "role": "user",
+        "role": "funcionario",
         "is_active": "on",
+        "empresa": empresa.id
     }
 
     response = client.post(reverse("usuarios:editar_usuario", kwargs={"id": usuario.id}), data=data)

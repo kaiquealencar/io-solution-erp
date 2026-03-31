@@ -9,81 +9,108 @@
         {% if usuario %}Editar Usuário{% else %}Cadastrar Usuário{% endif %}
     </h1>
 
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="p-3 rounded {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %} text-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <form method="POST" class="space-y-4">
         {% csrf_token %}
 
         <div>
-            <label for="email" class="block text-gray-700 font-medium mb-1">Email</label>
+            <label for="id_email" class="block text-gray-700 font-medium mb-1">Email</label>
             <input 
                 type="email" 
                 name="email" 
-                id="email"                
+                id="id_email"                
                 placeholder="Digite o email"
-                value="{{ usuario.email|default:'' }}" 
-                data-original="{{ usuario.email|default:'' }}"
+                value="{{ forms.email.value|default:email|default:'' }}" 
                 required
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
-                
+                class="w-full border {% if forms.email.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             >
-            <span id="email-msg" class="text-xs mt-1 block opacity-0 transition-opacity duration-500"></span>
+            {% if forms.email.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ forms.email.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <div>
-            <label for="nome" class="block text-gray-700 font-medium mb-1">Nome</label>
+            <label for="id_nome" class="block text-gray-700 font-medium mb-1">Nome</label>
             <input 
                 type="text" 
                 name="nome" 
-                id="nome"
+                id="id_nome"
                 placeholder="Digite o nome"
-                value="{{ usuario.nome|default:'' }}"
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                value="{{ forms.nome.value|default:nome|default:'' }}"
+                class="w-full border {% if forms.nome.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             >
-        </div>
-
-        <div class="relative">
-            <input 
-                type="password" 
-                name="password" 
-                id="password"
-                placeholder="Digite a senha"
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 pr-10"
-            >
-            <button type="button" id="togglePassword" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                👁️
-            </button>
+            {% if forms.nome.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ forms.nome.errors.0 }}</p>
+            {% endif %}
         </div>
 
         <div>
-            <label for="role" class="block text-gray-700 font-medium mb-1">Nível de Acesso</label>
+            <label for="id_password" class="block text-gray-700 font-medium mb-1">Senha</label>
+            <div class="relative">
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="id_password"
+                    placeholder="Digite a senha"
+                    class="w-full border {% if forms.password.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 pr-10"
+                >
+                <button type="button" id="togglePassword" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                    👁️
+                </button>
+            </div>
+            {% if forms.password.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ forms.password.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+       <div>
+            <label for="id_role" class="block text-gray-700 font-medium mb-1">Nível de Acesso</label>
             <select 
                 name="role" 
-                id="role"
+                id="id_role"
                 class="w-full border border-gray-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                required
             >
-                <option value="admin" {% if usuario.role == 'admin' %}selected{% endif %}>Administrador</option>
-                <option value="gerente" {% if usuario.role == 'gerente' %}selected{% endif %}>Gerente</option>
-                <option value="funcionario" {% if usuario.role == 'funcionario' %}selected{% endif %}>Funcionário</option>
+                <option value="" {% if not role_selecionado %}selected{% endif %}>Selecione um nível</option>
+
+                {% for val, label in role_choices %}
+                    <option value="{{ val }}" 
+                        {% if role_selecionado == val %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
             </select>
+
+            {% if forms.role.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ forms.role.errors.0 }}</p>
+            {% endif %}
         </div>
+
         <div class="flex items-center gap-2">
             <input 
                 type="checkbox" 
                 name="is_active" 
-                id="is_active"
-                {% if usuario and usuario.is_active %}checked{% endif %}
+                id="id_is_active"
+                {% if ativo or forms.is_active.value %}checked{% endif %}
                 class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-400"
             >
-            <label for="is_active" class="text-gray-700 font-medium">Ativo</label>
+            <label for="id_is_active" class="text-gray-700 font-medium">Ativo</label>
         </div>
-        <div class="text-center">
-            <button 
-                type="submit"
-                class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition"
-            >
+
+        <div class="text-center pt-4">
+            <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition">
                 {% if usuario %}Atualizar{% else %}Cadastrar{% endif %}
             </button>
-            
-            <a href="{% url 'usuarios:lista_usuarios' %}" class="block mt-2 text-sm text-gray-600 hover:text-gray-800 transition">
+            <a href="{% url 'usuarios:lista_usuarios' %}" class="block mt-4 text-sm text-gray-600 hover:text-gray-800 transition underline">
                 Voltar para a lista de usuários 
             </a>
         </div>
@@ -95,14 +122,11 @@
 <script src="{% static 'js/email_validator.js' %}"></script>
 <script>
     const togglePassword = document.querySelector('#togglePassword');
-    const passwordInput = document.querySelector('#password');
-
+    const passwordInput = document.querySelector('#id_password');
     togglePassword.addEventListener('click', function () {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
         this.textContent = type === 'password' ? '👁️' : '🙈';
     });
-    
 </script>
 {% endblock %}
-
