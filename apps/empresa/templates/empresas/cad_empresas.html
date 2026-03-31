@@ -17,10 +17,10 @@
         {% endfor %}
     {% endif %}
 
-    {% if errors %}
+    {% if form.errors %}
         <div class="mb-4 p-4 bg-red-100 text-red-800 rounded">
             <ul class="list-disc list-inside">
-            {% for field, msgs in errors.items %}
+            {% for field, msgs in form.errors.items %}
                 {% for msg in msgs %}
                     <li><strong>{{ field|capfirst }}:</strong> {{ msg }}</li>
                 {% endfor %}
@@ -36,13 +36,13 @@
             <div>
                 <label for="razao_social" class="block text-gray-700 font-medium mb-1">Razão Social *</label>
                 <input type="text" name="razao_social" id="razao_social" required
-                    value="{{ data.razao_social }}"
+                    value="{{ form.razao_social.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
             <div>
                 <label for="nome_fantasia" class="block text-gray-700 font-medium mb-1">Nome Fantasia</label>
                 <input type="text" name="nome_fantasia" id="nome_fantasia"
-                    value="{{ data.nome_fantasia }}"
+                    value="{{ form.nome_fantasia.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
         </div>
@@ -51,19 +51,19 @@
             <div>
                 <label for="cnpj" class="block text-gray-700 font-medium mb-1">CNPJ *</label>
                 <input type="text" name="cnpj" id="cnpj" required
-                    value="{{ data.cnpj }}"
+                    value="{{ form.cnpj.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
             <div>
                 <label for="inscricao_estadual" class="block text-gray-700 font-medium mb-1">Insc. Estadual</label>
                 <input type="text" name="inscricao_estadual" id="inscricao_estadual"
-                    value="{{ data.inscricao_estadual }}"
+                    value="{{ form.inscricao_estadual.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
             <div>
                 <label for="inscricao_municipal" class="block text-gray-700 font-medium mb-1">Insc. Municipal</label>
                 <input type="text" name="inscricao_municipal" id="inscricao_municipal"
-                    value="{{ data.inscricao_municipal }}"
+                    value="{{ form.inscricao_municipal.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
         </div>
@@ -71,7 +71,7 @@
         <div>
             <label for="cnae_principal" class="block text-gray-700 font-medium mb-1">CNAE Principal</label>
             <input type="text" name="cnae_principal" id="cnae_principal"
-                value="{{ data.cnae_principal }}"
+                value="{{ form.cnae_principal.value|default:'' }}"
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
         </div>
 
@@ -79,13 +79,13 @@
             <div>
                 <label for="email" class="block text-gray-700 font-medium mb-1">E-mail *</label>
                 <input type="email" name="email" id="email" required
-                    value="{{ data.email }}"
+                    value="{{ form.email.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
             <div>
                 <label for="telefone" class="block text-gray-700 font-medium mb-1">Telefone</label>
                 <input type="text" name="telefone" id="telefone"
-                    value="{{ data.telefone }}"
+                    value="{{ form.telefone.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
         </div>
@@ -96,21 +96,20 @@
                 <div class="md:col-span-1">
                     <label for="cep" class="block text-gray-700 font-medium mb-1">CEP *</label>
                     <input type="text" name="cep" id="cep" required
-                        value="{{ data.cep }}"
-                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
-                        >
+                        value="{{ form.cep.value|default:'' }}"
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
                 </div>
                 <div class="md:col-span-2">
                     <label for="logradouro" class="block text-gray-700 font-medium mb-1">Logradouro *</label>
                     <input type="text" name="logradouro" id="logradouro" required
-                        value="{{ data.logradouro }}"
+                        value="{{ form.logradouro.value|default:'' }}"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
                         readonly style="background-color: #e9ecef;">
                 </div>
                 <div>
                     <label for="numero" class="block text-gray-700 font-medium mb-1">Número *</label>
                     <input type="text" name="numero" id="numero" required
-                        value="{{ data.numero }}"
+                        value="{{ form.numero.value|default:'' }}"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
                 </div>
             </div>
@@ -118,27 +117,27 @@
                 <div>
                     <label for="complemento" class="block text-gray-700 font-medium mb-1">Complemento</label>
                     <input type="text" name="complemento" id="complemento"
-                        value="{{ data.complemento }}"
+                        value="{{ form.complemento.value|default:'' }}"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
                 </div>
                 <div>
                     <label for="bairro" class="block text-gray-700 font-medium mb-1">Bairro *</label>
                     <input type="text" name="bairro" id="bairro" required
-                        value="{{ data.bairro }}"
+                        value="{{ form.bairro.value|default:'' }}"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
                         readonly style="background-color: #e9ecef;">
                 </div>
                 <div>
                     <label for="cidade" class="block text-gray-700 font-medium mb-1">Cidade *</label>
                     <input type="text" name="cidade" id="cidade" required
-                        value="{{ data.cidade }}" 
+                        value="{{ form.cidade.value|default:'' }}" 
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400" 
                         readonly style="background-color: #e9ecef;">
                 </div>
                 <div>
                     <label for="estado" class="block text-gray-700 font-medium mb-1">Estado (UF) *</label>
                     <input type="text" name="estado" id="estado" maxlength="2" required
-                        value="{{ data.estado }}"
+                        value="{{ form.estado.value|default:'' }}"
                         class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400"
                         readonly style="background-color: #e9ecef;">
                 </div>
@@ -146,7 +145,7 @@
             <div class="mt-4">
                 <label for="pais" class="block text-gray-700 font-medium mb-1">País</label>
                 <input type="text" name="pais" id="pais"
-                    value="{{ data.pais }}"
+                    value="{{ form.pais.value|default:'' }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
         </div>
@@ -158,7 +157,7 @@
                     class="w-full border border-gray-300 rounded px-3 py-2 bg-white">
                     <option value="">-- Selecione --</option>
                     {% for val, label in regimes %}
-                        <option value="{{ val }}" {% if val == data.regime_tributario %}selected{% endif %}>{{ label }}</option>
+                        <option value="{{ val }}" {% if val|stringformat:"s" == form.regime_tributario.value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -167,7 +166,7 @@
                 <select name="tipo_empresa" id="tipo_empresa" required
                     class="w-full border border-gray-300 rounded px-3 py-2 bg-white">
                     {% for val, label in tipos %}
-                        <option value="{{ val }}" {% if val == data.tipo_empresa %}selected{% endif %}>{{ label }}</option>
+                        <option value="{{ val }}" {% if val|stringformat:"s" == form.tipo_empresa.value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -176,7 +175,7 @@
                 <select name="moeda_padrao" id="moeda_padrao" required
                     class="w-full border border-gray-300 rounded px-3 py-2 bg-white">
                     {% for val, label in moedas %}
-                        <option value="{{ val }}" {% if val == data.moeda_padrao %}selected{% endif %}>{{ label }}</option>
+                        <option value="{{ val }}" {% if val|stringformat:"s" == form.moeda_padrao.value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -188,7 +187,7 @@
                 <option value="">-- Selecione se Filial --</option>
                 {% for m in matrizes %}
                     {% if not empresa or m.id != empresa.id %}
-                        <option value="{{ m.id }}" {% if m.id|stringformat:"s" == data.matriz %}selected{% endif %}>
+                        <option value="{{ m.id }}" {% if m.id|stringformat:"s" == form.matriz.value|stringformat:"s" %}selected{% endif %}>
                             {{ m.nome_fantasia|default:m.razao_social }}
                         </option>
                     {% endif %}
@@ -210,7 +209,7 @@
                 <div>
                     <label for="senha_certificado" class="block text-gray-700 font-medium mb-1">Senha</label>
                     <input type="password" name="senha_certificado" id="senha_certificado"
-                        value="{{ data.senha_certificado }}"
+                        value="{{ form.senha_certificado.value|default:'' }}"
                         class="w-full border border-gray-300 rounded px-3 py-2">
                 </div>
             </div>
@@ -223,8 +222,8 @@
             <div class="mt-2">
                 {% if empresa and empresa.logo %}
                     <img id="logoPreview"
-                         src="{{ empresa.logo.url|default:''}}"
-                         class="max-h-32 rounded border shadow-sm" {% if not empresa.logo%} hidden{% endif %}>
+                         src="{{ empresa.logo.url }}"
+                         class="max-h-32 rounded border shadow-sm">
                 {% else %}
                     <img id="logoPreview" src="" class="max-h-32 rounded border shadow-sm hidden">
                 {% endif %}
@@ -233,7 +232,7 @@
 
         <div class="flex items-center gap-2">
             <input type="checkbox" name="ativo" id="ativo"
-                {% if data.ativo == "on" %}checked{% endif %}
+                {% if form.ativo.value %}checked{% endif %}
                 class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-400">
             <label for="ativo" class="text-gray-700 font-medium">Empresa Ativa</label>
         </div>
