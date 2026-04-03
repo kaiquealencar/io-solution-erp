@@ -1,19 +1,28 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
 
 from apps.empresa import forms
 from .models import Usuario
 from apps.empresa.models import Empresa
 from .services import salvar_usuario
 from .email_validator import verificar_duplicidade_no_banco
-from .forms import UsuarioForm
+from .forms import UsuarioForm, LoginForm
+
+class CustomLoginView(LoginView):
+    authentication_form = LoginForm
+    template_name = 'usuarios/login.html'
 
 
+
+@login_required
 def lista_usuarios(request):
     usuarios = Usuario.objects.only("nome", "email", "role", "is_active").order_by('-date_joined')
     return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
 
+@login_required
 def cad_usuario(request):  
     forms = UsuarioForm(request.POST or None)
     if request.method == 'POST':
@@ -52,6 +61,7 @@ def cad_usuario(request):
     
     return render(request, 'usuarios/cad_usuario.html', context)
 
+@login_required
 def editar_usuario(request, id):
     usuario = get_object_or_404(Usuario, id=id)    
     forms = UsuarioForm(request.POST or None, instance=usuario)       
@@ -81,13 +91,12 @@ def editar_usuario(request, id):
 
     return render(request, 'usuarios/cad_usuario.html', context)
 
-
+@login_required
 def excluir_usuario(request, id):
     usuario = get_object_or_404(Usuario, id=id)
     usuario.delete()
     messages.success(request, f"Usuário {usuario.email} excluído com sucesso!")
     return redirect('usuarios:lista_usuarios')
-
 
 
 def validar_email(request):

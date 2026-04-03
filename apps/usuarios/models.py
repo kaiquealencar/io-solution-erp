@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
+from django.core.exceptions import ValidationError
 
 
 class UsuarioManager(BaseUserManager):
@@ -24,7 +25,6 @@ class UsuarioManager(BaseUserManager):
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
-        ('admin', 'Administrador'),
         ('gerente', 'Gerente'),
         ('funcionario', 'Funcionário'),
     )
@@ -52,5 +52,19 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'       
     REQUIRED_FIELDS = []        
        
+
+    def clean(self):
+        super().clean()
+        if not self.is_superuser and not self.empresa:
+            raise ValidationError({
+                "empresa": "Esse campo é obrigatório para usuários."
+            })
+        
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
     def __str__(self):
         return self.email

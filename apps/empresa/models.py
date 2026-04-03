@@ -91,5 +91,10 @@ class Empresa(models.Model):
                 'matriz': 'Filial deve estar vinculada a uma matriz.'
             })
 
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.nome_fantasia or self.razao_social

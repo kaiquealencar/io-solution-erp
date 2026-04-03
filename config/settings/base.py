@@ -137,4 +137,9 @@ LOGGING = {
     },
 }
 
+
+LOGIN_URL = "usuarios:login"
+LOGIN_REDIRECT_URL= "index"
+LOGOUT_REDIRECT_URL = 'usuarios:login'
+
 GLOBAL_SYSTEM_NAME = "I/O Solution ERP"

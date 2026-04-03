@@ -2,15 +2,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils.timezone import now
-from .forms import RefeicaoDiaForm
+from django.contrib.auth.decorators import login_required
 
+from .forms import RefeicaoDiaForm
 from .models import Refeicoes, RefeicaoDia
 from .services import filtro_refeicoes_dia
 
+
+
+@login_required
 def listar_refeicoes(request):
     refeicoes = Refeicoes.objects.only("id", "nome", "tipo").order_by('nome')
     return render(request, 'refeicoes/listar_refeicoes.html', {'refeicoes': refeicoes})
 
+@login_required
 def cadastrar_refeicao(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
@@ -25,7 +30,7 @@ def cadastrar_refeicao(request):
 
     return render(request, 'refeicoes/cadastrar_refeicao.html')
 
-
+@login_required
 def editar_refeicao(request, id):
     refeicao = get_object_or_404(Refeicoes, id=id)
 
@@ -44,13 +49,14 @@ def editar_refeicao(request, id):
 
     return render(request, 'refeicoes/cadastrar_refeicao.html', {'refeicao': refeicao})
 
+@login_required
 def excluir_refeicao(request, id):
     refeicao = get_object_or_404(Refeicoes, id=id)
     refeicao.delete()
     messages.success(request, 'Refeição excluída com sucesso!')
     return redirect('refeicoes:listar_refeicoes')
 
-
+@login_required
 def listar_refeicoes_dia(request):
     quinzena = request.GET.get('quinzena')
     mes = request.GET.get('mes')
@@ -71,7 +77,7 @@ def listar_refeicoes_dia(request):
 
     return render(request, 'refeicoes/listar_refeicoes_dia.html', context)
 
-
+@login_required
 def cadastrar_refeicao_dia(request):
     forms = RefeicaoDiaForm(request.POST or None)
     if request.method == 'POST':
@@ -93,6 +99,7 @@ def cadastrar_refeicao_dia(request):
 
     return render(request, 'refeicoes/cadastrar_refeicoes_dia.html', context)
 
+@login_required
 def editar_refeicao_dia(request, id):
     refeicao_dia = get_object_or_404(RefeicaoDia, id=id)
     form = RefeicaoDiaForm(request.POST or None, instance=refeicao_dia)
@@ -113,6 +120,7 @@ def editar_refeicao_dia(request, id):
     
     return render(request, 'refeicoes/cadastrar_refeicoes_dia.html', context)
 
+@login_required
 def excluir_refeicao_dia(request, id): 
     refeicao_dia = get_object_or_404(RefeicaoDia, id=id)
     refeicao_dia.delete()

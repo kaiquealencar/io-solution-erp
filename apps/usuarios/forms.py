@@ -1,5 +1,5 @@
 from django import forms
-
+from django.contrib.auth.forms import AuthenticationForm
 from apps.usuarios.email_validator import verificar_duplicidade_no_banco
 from .models import Usuario
 
@@ -33,3 +33,13 @@ class UsuarioForm(forms.ModelForm):
           usuario.save()
         
         return usuario
+
+class LoginForm(AuthenticationForm):
+    username = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none',
+        'placeholder': 'Seu e-mail'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none',
+        'placeholder': 'Sua senha'
+    }))
