@@ -22,11 +22,11 @@ def empresa_teste(db):
 
 @pytest.fixture
 def usuario_gerente(db, empresa_teste):
-    return Usuario.objects.create(
+    return Usuario.objects.create_user(
         email="gerente@iosolution.com",
         password="senha_segura_123",
         empresa=empresa_teste,
-        role="Gerente"
+        role="gerente"
     )
 
 @pytest.fixture
