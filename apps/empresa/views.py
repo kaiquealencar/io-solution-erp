@@ -22,13 +22,7 @@ def listar_empresas(request):
         "regime_tributario",
         "ativo"
     ).order_by("-criado_em")
-   # empresas = Empresa.objects.filter(id=request.user.empresa.id).only(
-   #     "razao_social",
-   #     "nome_fantasia", 
-   #     "cnpj", 
-   #     "regime_tributario", 
-   #     "ativo").order_by('-criado_em')
-    
+  
     return render(request, 'empresas/listar_empresas.html', {'empresas': empresas})
 
 

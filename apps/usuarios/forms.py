@@ -9,7 +9,7 @@ class UsuarioForm(forms.ModelForm):
     
     class Meta:
         model = Usuario
-        fields = "__all__"
+        fields = ["nome", "email", "password", "role", "is_active"]
 
         exclude = [
             'date_joined',      
@@ -20,6 +20,12 @@ class UsuarioForm(forms.ModelForm):
             'user_permissions', 
         ]
     
+    def __init__(self, *args, **kwargs):
+
+        self.empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)        
+
+
     def save(self, commit=True):
         usuario = super().save(commit=False)
         senha = self.cleaned_data.get('password')
@@ -33,6 +39,12 @@ class UsuarioForm(forms.ModelForm):
           usuario.save()
         
         return usuario
+    
+    def clean(self):
+        if self.empresa:
+            self.instance.empresa = self.empresa
+        
+        return super().clean()
 
 class LoginForm(AuthenticationForm):
     username = forms.EmailField(widget=forms.EmailInput(attrs={

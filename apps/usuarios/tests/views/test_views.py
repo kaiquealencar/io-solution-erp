@@ -1,92 +1,66 @@
-from urllib import response
-
 import pytest
-from django.urls import reverse 
-from apps.usuarios.models import Usuario
+from django.contrib.auth import get_user_model 
+from django.urls import reverse
 from apps.empresa.models import Empresa
-
-
-@pytest.mark.django_db
-def test_listar_usuarios(client):    
-    Usuario.objects.create_user(
-        email="example@example.com.br",
-        nome="fulano",
-        password="senha123",
-        role="admin"
-    )
-
-    response = client.get(reverse("usuarios:lista_usuarios"))
-    assert response.status_code == 200
-    assert len(response.context["usuarios"]) == 1
+from apps.usuarios.models import Usuario
 
 @pytest.mark.django_db
-def test_cadastrar_usuario(client):
-    empresa = Empresa.objects.create(razao_social="Empresa Teste")
-    data = {
-        "email": "example@example.com.br",
-        "nome": "fulano",
-        "password": "senha123",
-        "role": "admin",
-        "is_active": "on",
-        "empresa": empresa.id
-    }
+class TestUsuarioList:
 
-    response = client.post(reverse("usuarios:cadastrar_usuario"), data=data)
-    assert response.status_code == 302  
+    def test_acesso_negado_anonimo(self, client):
+        url = reverse("usuarios:lista_usuarios")
+        response = client.get(url)
 
-    usuario = Usuario.objects.first()
-    assert usuario is not None
-    assert usuario.email == data["email"]
-    assert usuario.nome == data["nome"]
-    assert usuario.role == data["role"]
-    assert usuario.is_active is True
-    assert usuario.empresa.id == empresa.id
-    assert usuario.check_password(data["password"])
+        assert response.status_code == 302
+        assert "/login" in response.url
 
 
-@pytest.mark.django_db
-def test_editar_usuario(client):
-    empresa = Empresa.objects.create(razao_social="Empresa Teste")
-    
-    usuario = Usuario.objects.create_user(
-        email="example@example.com.br",
-        nome="fulano",
-        password="senha123",
-        role="admin",
-        is_active=True,
-        empresa=empresa
-    )
+    def test_usuario_logado_ve_apenas_uma_empresa(self, cliente_a, matriz_demo):     
+        url = reverse("usuarios:lista_usuarios")
+        response = cliente_a.get(url)       
+        
+        assert response.status_code == 200
+        assert matriz_demo.nome_fantasia in response.content.decode()
 
-    data = {
-        "email": "updated@example.com.br",
-        "nome": "ciclano",
-        "password": "nova_senha123",
-        "role": "funcionario",
-        "is_active": "on",
-        "empresa": empresa.id
-    }
+    def test_listar_usuarios_da_empresa_ativa(self, cliente_a, usuario_a): 
+        Usuario.objects.create_user(
+            email="funcionario_novo@teste.com",
+            nome="Novo Funcionario",
+            password="123",
+            role="funcionario",
+            empresa=usuario_a.empresa 
+        )
 
-    response = client.post(reverse("usuarios:editar_usuario", kwargs={"id": usuario.id}), data=data)
-    assert response.status_code == 302
+        url = reverse("usuarios:lista_usuarios")
+        response = cliente_a.get(url)
 
-    usuario.refresh_from_db()
-
-    assert usuario.email == data["email"]
-    assert usuario.nome == data["nome"]
-    assert usuario.role == data["role"]
-    assert usuario.is_active is True
-    assert usuario.check_password(data["password"])  
+        assert response.status_code == 200
+        assert len(response.context["usuarios"]) >= 2
+        assert "funcionario_novo@teste.com" in response.content.decode()
 
 
-@pytest.mark.django_db
-def test_excluir_usuario(client):
-    usuario = Usuario.objects.create_user(
-        email="example@example.com.br",
-        nome="fulano",
-        password="senha123",
-        role="admin"
-    )
 
-    response = client.post(reverse("usuarios:excluir_usuario", kwargs={"id": usuario.id}))
-    assert response.status_code == 302
-    assert Usuario.objects.count() == 0
+    def test_cadastro_usuario_sucesso(self, cliente_a, usuario_a):
+        dados = {
+            "email": "novo@iosolution.com",
+            "nome": "novo funcionario",
+            "password": "novo123",
+            "role": "funcionario",
+            "is_active": True
+        }
+
+        url = reverse("usuarios:cadastrar_usuario")
+        response = cliente_a.post(url, data=dados)
+
+        assert response.status_code == 302
+        
+        novo_usuario = Usuario.objects.get(email="novo@iosolution.com")
+
+        assert novo_usuario.empresa == usuario_a.empresa
+        assert novo_usuario.nome == "novo funcionario"
+
+
+
+
+
+

@@ -9,7 +9,7 @@ def matriz_demo(db):
     return Empresa.objects.create(
         razao_social="I/O Solution LTDA",
         nome_fantasia="I/O Solution LTDA",
-        cnpj="79.800.500/0001-68",
+        cnpj="74.515.886/0001-42",
         logradouro="avenida Brasil",
         numero="531",
         bairro="Vila Antonio Augusto",

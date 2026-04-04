@@ -56,9 +56,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def clean(self):
         super().clean()
         if not self.is_superuser and not self.empresa:
-            raise ValidationError({
-                "empresa": "Esse campo é obrigatório para usuários."
-            })
+            raise ValidationError("A empresa é obrigatória para usuários comuns.")
         
 
     def save(self, *args, **kwargs):

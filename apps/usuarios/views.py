@@ -19,29 +19,31 @@ class CustomLoginView(LoginView):
 
 @login_required
 def lista_usuarios(request):
-    usuarios = Usuario.objects.only("nome", "email", "role", "is_active").order_by('-date_joined')
+    queryset = Usuario.objects.all()
+
+    if not request.user.is_superuser:
+        queryset = queryset.filter(empresa_id=request.user.empresa_id)
+
+    
+    usuarios = queryset.only(
+        "nome",
+        "email",
+        "role",
+        "is_active"
+    ).order_by("-date_joined")
+
     return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
 
 @login_required
 def cad_usuario(request):  
-    forms = UsuarioForm(request.POST or None)
-    if request.method == 'POST':
+    empresa_vinculada = request.user.empresa if request.user.empresa else Empresa.objects.filter(ativo=True).first()
+    forms = UsuarioForm(request.POST or None, empresa=empresa_vinculada)
+
+    if request.method == 'POST':   
         if forms.is_valid():
-            try:        
-                user = forms.save(commit=False)
+            try:
+                forms.save()        
 
-                empresa_ativa = Empresa.objects.filter(ativo=True).first()
-                senha = forms.cleaned_data.get('password')
-
-                if not user.empresa:
-                    user.empresa = empresa_ativa
-
-                print(f"salvando a empresa: {user.empresa}")
-
-                if senha:
-                    user.set_password(senha)
-
-                user.save() 
                 messages.success(request, f"Usuário: {forms.cleaned_data['email']} cadastrado com sucesso!")
                 return redirect('usuarios:lista_usuarios')
             except ValueError as e:
