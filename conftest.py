@@ -6,6 +6,7 @@ from apps.usuarios.models import Usuario
 def empresa_teste(db):
     return Empresa.objects.create(
         razao_social="I/O Solution LTDA",
+        nome_fantasia="I/O Solution LTDA",
         cnpj="79.800.500/0001-68",
         logradouro="avenida Brasil",
         numero="531",
