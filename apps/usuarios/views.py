@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 
 from apps.empresa import forms
 from .models import Usuario
@@ -65,22 +66,22 @@ def cad_usuario(request):
 
 @login_required
 def editar_usuario(request, id):
-    usuario = get_object_or_404(Usuario, id=id)    
-    forms = UsuarioForm(request.POST or None, instance=usuario)       
+    usuario = get_object_or_404(Usuario, id=id, empresa=request.user.empresa)    
+    empresa_vinculada = request.user.empresa or usuario.empresa
+    forms = UsuarioForm(request.POST or None, instance=usuario, empresa=empresa_vinculada)       
 
     if request.method == 'POST':           
         if forms.is_valid():
             try:
-                usuario_atualizado = forms.save(commit=False)
-
-                if not usuario_atualizado.empresa:
-                    usuario_atualizado.empresa = Empresa.objects.filter(ativo=True).first()
-
-                usuario_atualizado.save()     
+                forms.save()
                 messages.success(request, f"Usuário {usuario.email} atualizado com sucesso!")
                 return redirect('usuarios:lista_usuarios')
-            except ValueError as e:
-                messages.error(request, str(e))
+            except ValidationError as e:
+                for field, errors in e.message_dict.items():
+                    for error in errors:
+                        messages.error(request, f"Erro no campo {field}: {error}")
+        else:
+            messages.error(request, "Erro ao atualizar. Verifique os campos!")
 
     context = _get_usuario_context(
         forms, 
@@ -95,9 +96,14 @@ def editar_usuario(request, id):
 
 @login_required
 def excluir_usuario(request, id):
-    usuario = get_object_or_404(Usuario, id=id)
-    usuario.delete()
-    messages.success(request, f"Usuário {usuario.email} excluído com sucesso!")
+    usuario = get_object_or_404(Usuario, id=id, empresa=request.user.empresa)
+
+    if request.method == "POST":
+        email_salvo = usuario.email
+        usuario.delete()
+        messages.success(request, f"Usuário {email_salvo} excluído com sucesso!")
+        return redirect('usuarios:lista_usuarios')
+
     return redirect('usuarios:lista_usuarios')
 
 
@@ -117,22 +123,6 @@ def validar_email(request):
     
     return JsonResponse({"error": "Método não permitido."}, status=405)
 
-def _get_form_field(request):
-    email = request.POST.get("email")    
-    nome = request.POST.get("nome")
-    password = request.POST.get("password")
-    role = request.POST.get("role")
-    val = request.POST.get("is_active")
-    ativo = val in ['on', 'True', True]
-
-
-    return {
-        "email": email,
-        "nome": nome,
-        "password": password,
-        "role": role,
-        "ativo": ativo
-    }
 
 
 def _get_usuario_context(forms, email=None, nome=None, role=None, ativo=None, data=None):

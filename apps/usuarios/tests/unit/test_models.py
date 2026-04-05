@@ -12,6 +12,7 @@ class TestUsuarioModel:
     def test_criar_usuario_gerente_sucesso(self, usuario_gerente):
         assert Usuario.objects.count() == 1
         assert usuario_gerente.email == "gerente@iosolution.com"
+        assert usuario_gerente.nome == "Gerente"
         assert usuario_gerente.role == "gerente"
 
 
@@ -53,7 +54,8 @@ class TestUsuarioModel:
         
         with pytest.raises(Exception):
             Usuario.objects.create_user(
-                email="gerente@iosolution.com", # Mesmo e-mail da fixture
+                email="gerente@iosolution.com",
+                nome="Gerente",
                 password="outra_senha",
                 empresa=empresa_teste
             )
@@ -61,7 +63,9 @@ class TestUsuarioModel:
     def test_usuario_comum_sem_empresa_deve_falhar(self):
         usuario = Usuario(
             email="sem_empresa@teste.com",
-            role="Funcionario"
+            nome="Usuario sem empresa",
+            role="funcionario",
+            password="senha_temporaria" 
         )
 
         with pytest.raises(ValidationError) as excinfo:
@@ -72,6 +76,7 @@ class TestUsuarioModel:
     def test_superuser_criado_sem_empresa_com_sucesso(self):
         admin = Usuario.objects.create_superuser(
             email="admin@iosolution.com",
+            nome="Admin",
             password="adminpassword"
         )
 
@@ -84,6 +89,7 @@ class TestUsuarioModel:
         
         usuario = Usuario.objects.create_user(
             email=email_maiusculo,
+            nome="Teste Email",
             password="password123",
             empresa=empresa_teste
         )

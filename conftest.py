@@ -25,6 +25,7 @@ def empresa_teste(db):
 def usuario_gerente(db, empresa_teste):
     return Usuario.objects.create_user(
         email="gerente@iosolution.com",
+        nome="Gerente",
         password="senha_segura_123",
         empresa=empresa_teste,
         role="gerente"

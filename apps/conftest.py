@@ -26,6 +26,7 @@ def matriz_demo(db):
 def usuario_a(db, matriz_demo):
     return User.objects.create_user(
         email='user_a@test.com',
+        nome="user_a",
         password='123',
         empresa=matriz_demo
     )

@@ -6,12 +6,15 @@ from django.core.exceptions import ValidationError
 
 
 class UsuarioManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, nome, password=None, **extra_fields):
         if not email:
             raise ValueError("O usuário deve ter um email")
 
+        if not nome:
+            raise ValueError("O usuário deve ter um nome")
+
         email = self.normalize_email(email).lower()
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email, nome=nome, **extra_fields)
         user.set_password(password)  
         user.save(using=self._db)
         return user
@@ -19,8 +22,9 @@ class UsuarioManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        nome = extra_fields.pop('nome', 'Administrador')
 
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(email, nome, password, **extra_fields)
 
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
@@ -40,7 +44,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     )
 
     email = models.EmailField(unique=True)
-    nome = models.CharField(max_length=255, blank=True)
+    nome = models.CharField(max_length=255, blank=False)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -56,7 +60,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def clean(self):
         super().clean()
         if not self.is_superuser and not self.empresa:
-            raise ValidationError("A empresa é obrigatória para usuários comuns.")
+            raise ValidationError({'empresa': "A empresa é obrigatória para usuários comuns."})
         
 
     def save(self, *args, **kwargs):

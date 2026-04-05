@@ -5,7 +5,11 @@ from .models import Usuario
 
 
 class UsuarioForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, required=False)
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        required=True, 
+        label="Senha"
+    )
     
     class Meta:
         model = Usuario
@@ -23,7 +27,10 @@ class UsuarioForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
         self.empresa = kwargs.pop('empresa', None)
-        super().__init__(*args, **kwargs)        
+        super().__init__(*args, **kwargs)     
+        
+        if self.instance.pk:  
+            self.fields['password'].required = False   
 
 
     def save(self, commit=True):

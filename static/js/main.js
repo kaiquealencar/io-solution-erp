@@ -13,6 +13,28 @@ if (menuButton && menuDropdown) {
     });
 }
 
+function confirmarExclusao(event, elemento) {
+   event.preventDefault();
+    const formulario = elemento.closest('form');
+
+    Swal.fire({
+        title: 'Tem certeza?',
+        text: "Esta ação não pode ser desfeita!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a', 
+        cancelButtonColor: '#dc2626',  
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            formulario.submit(); 
+        }
+    });
+}
+
+/*
 function confirmarExclusao(event, url) {
     event.preventDefault();
     Swal.fire({
@@ -38,4 +60,4 @@ const Toast = Swal.mixin({
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: true,
-});
+});*/
