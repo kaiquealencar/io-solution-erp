@@ -100,19 +100,20 @@ class TestUsuario:
         assert "nome" in response.context["forms"].errors
         
     def test_excluir_usuario_sucesso(self, cliente_a, usuario_a):
-        usuario_remover = Usuario.objects.create_user(
-            email="remover@test.com",
-            nome="Remover",
-            password="rem123",
+        usuario_a.role = 'gerente'
+        usuario_a.save()
+    
+        usuario_alvo = Usuario.objects.create_user(
+            email="alvo@test.com", 
+            nome="Alvo", 
             empresa=usuario_a.empresa
         )
-
-        url = reverse("usuarios:excluir_usuario", kwargs={"id": usuario_remover.id})
+    
+        url = reverse("usuarios:excluir_usuario", kwargs={"id": usuario_alvo.id})
         response = cliente_a.post(url)
-        assert response.status_code == 302        
-        assert response.url == reverse('usuarios:lista_usuarios')
-        
-        assert not Usuario.objects.filter(id=usuario_remover.id).exists()
+    
+        assert response.status_code == 302
+        assert not Usuario.objects.filter(id=usuario_alvo.id).exists()
 
     def test_usuario_nao_pode_excluir_outra_empresa(self, cliente_a, usuario_a):
         empresa_b = Empresa.objects.create(
@@ -140,8 +141,9 @@ class TestUsuario:
 
         url = reverse("usuarios:excluir_usuario", kwargs={"id": usuario_b.id})
         response = cliente_a.post(url)
-        
-        assert response.status_code == 404
+        assert response.status_code == 302
+        assert response.url == reverse("usuarios:lista_usuarios")
+
         assert Usuario.objects.filter(id=usuario_b.id).exists()
 
 

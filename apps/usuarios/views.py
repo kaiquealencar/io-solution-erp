@@ -20,17 +20,14 @@ class CustomLoginView(LoginView):
 
 @login_required
 def lista_usuarios(request):
-    queryset = Usuario.objects.all()
-
-    if not request.user.is_superuser:
-        queryset = queryset.filter(empresa_id=request.user.empresa_id)
-
+    queryset = Usuario.objects.all() if request.user.is_superuser else Usuario.objects.filter(empresa_id=request.user.empresa_id)
     
     usuarios = queryset.only(
         "nome",
         "email",
         "role",
-        "is_active"
+        "is_active",
+        "date_joined"
     ).order_by("-date_joined")
 
     return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
@@ -66,7 +63,13 @@ def cad_usuario(request):
 
 @login_required
 def editar_usuario(request, id):
-    usuario = get_object_or_404(Usuario, id=id, empresa=request.user.empresa)    
+    usuario = get_object_or_404(Usuario, id=id)    
+
+    if not request.user.is_superuser:
+        if usuario.empresa_id != request.user.empresa_id:
+            messages.error(request, "Acesso negado: Este usuário pertence a outra empresa.")
+            return redirect('usuarios:lista_usuarios')        
+
     empresa_vinculada = request.user.empresa or usuario.empresa
     forms = UsuarioForm(request.POST or None, instance=usuario, empresa=empresa_vinculada)       
 
@@ -88,7 +91,7 @@ def editar_usuario(request, id):
         email= forms["email"].value() or usuario.email, 
         nome=forms["nome"].value() or usuario.nome, 
         role=forms["role"].value() or usuario.role, 
-        ativo=forms["is_active"].value(),
+        ativo=forms["is_active"].value() or usuario.is_active,
         data=request.POST if request.method == 'POST' else None
     )
 
@@ -96,7 +99,20 @@ def editar_usuario(request, id):
 
 @login_required
 def excluir_usuario(request, id):
-    usuario = get_object_or_404(Usuario, id=id, empresa=request.user.empresa)
+    usuario = get_object_or_404(Usuario, id=id)
+
+    if not request.user.is_superuser:
+        if request.user.role != "gerente":
+            messages.error(request, "Acesso negado. Apenas nível 'gerente' pode excluir usuários.")
+            return redirect("usuarios:lista_usuarios")
+        
+        if usuario.empresa_id != request.user.empresa_id:
+            messages.error(request, "Acesso negado. Você não pode excluir um usuário de outra empresa.")
+            return redirect("usuarios:lista_usuarios")
+    
+    if request.user.id == usuario.id:
+        messages.error(request, "Operação negada. Você não pode excluir sua própria conta.")
+        return redirect("usuarios:lista_usuarios")
 
     if request.method == "POST":
         email_salvo = usuario.email
@@ -104,7 +120,7 @@ def excluir_usuario(request, id):
         messages.success(request, f"Usuário {email_salvo} excluído com sucesso!")
         return redirect('usuarios:lista_usuarios')
 
-    return redirect('usuarios:lista_usuarios')
+    return render(request, 'usuarios/lista_usuarios.html', {'usuario': usuario})
 
 
 def validar_email(request):
