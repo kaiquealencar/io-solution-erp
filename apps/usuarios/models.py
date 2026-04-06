@@ -37,7 +37,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     empresa = models.ForeignKey(
         'empresa.Empresa',
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name='usuarios',
         null=True,  
         blank=True

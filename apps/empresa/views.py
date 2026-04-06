@@ -50,8 +50,13 @@ def cadastrar_empresa(request):
 
 @login_required
 def editar_empresa(request, id):
-    empresa = get_object_or_404(Empresa, id=id, pk=request.user.empresa.id)
+    empresa = get_object_or_404(Empresa, id=id)
     form = EmpresaForm(request.POST or None, request.FILES or None, instance=empresa)
+
+    if not request.user.is_superuser:
+        if request.user.empresa is None or request.user.empresa.id != empresa.id:
+            messages.error(request, "Acesso negado: Você não tem permissão para editar esta empresa.")
+            return redirect('empresa:listar_empresas')
 
     if request.method == 'POST':
         if form.is_valid():
@@ -75,22 +80,43 @@ def editar_empresa(request, id):
 
 @login_required
 def excluir_empresa(request, id):
-    empresa = get_object_or_404(Empresa, id=id, pk=request.user.empresa.id)
-    empresa.delete()
-    messages.success(request, "Empresa excluída com sucesso!")
+    empresa = get_object_or_404(Empresa, id=id)
+
+    if request.user.empresa and request.user.empresa.id == empresa.id:
+        messages.error(request, "Operação negada: você não pode excluir a própria empresa onde está logado.")
+        return redirect('empresa:listar_empresas')
+
+    if request.method == "POST":
+        empresa.delete()
+
+        messages.success(request, "Empresa excluída com sucesso!")
+        return redirect('empresa:listar_empresas')
+
     return redirect('empresa:listar_empresas')
 
 
 def _get_empresa_context(request, form, empresa=None, data=None):
-    return {
-       "form": form,
+    qs = Empresa.objects.filter(tipo_empresa="MATRIZ")
+    
+    if request.user.is_superuser:
+        matrizes = qs
+    elif request.user.empresa:
+        matrizes = qs.filter(id=request.user.empresa.id)
+    else:
+        matrizes = qs.none()
+    
+
+    context = {       
+        "form": form,
         "empresa": empresa,
         "data": data,
         "regimes": Empresa._meta.get_field('regime_tributario').choices,
         "tipos": Empresa._meta.get_field('tipo_empresa').choices,
         "moedas": Empresa._meta.get_field('moeda_padrao').choices,
-        "matrizes": Empresa.objects.filter(tipo_empresa='MATRIZ', id=request.user.empresa.id),
+        "matrizes": matrizes
     }
+
+    return context
 
 
 

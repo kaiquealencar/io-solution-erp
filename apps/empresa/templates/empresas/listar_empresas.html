@@ -38,12 +38,15 @@
                         <a href="{% url 'empresa:editar_empresa' empresa.id %}" 
                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition">
                             Editar
-                        </a>
-                        <a href="#" 
-                            onclick="confirmarExclusao(event, '{% url 'empresa:excluir_empresa' empresa.id %}')" 
-                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition duration-150 inline-block">
-                            Excluir
-                        </a>
+                        </a>                      
+                        <form action="{% url 'empresa:excluir_empresa' empresa.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    onclick="confirmarExclusao(event, this)" 
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition duration-150">
+                                Excluir
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% empty %}

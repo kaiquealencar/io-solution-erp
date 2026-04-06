@@ -96,5 +96,10 @@ class Empresa(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):                
+        self.ativo = False
+        self.save()
+        self.usuarios.update(is_active=False)
+        
     def __str__(self):
         return self.nome_fantasia or self.razao_social

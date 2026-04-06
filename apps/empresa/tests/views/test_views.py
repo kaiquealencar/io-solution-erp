@@ -58,4 +58,27 @@ class TesteEmpresaDetailView():
         url = reverse("empresa:editar_empresa", kwargs={"id": outra_empresa.id})
         response = cliente_a.get(url)
 
-        assert response.status_code == 404
+        assert response.status_code == 302
+        assert response.url == reverse('empresa:listar_empresas')
+        
+        def test_excluir_empresa_view_redireciona_sucesso(self, client, admin_user):
+            empresa_alvo = Empresa.objects.create(
+                razao_social="Empresa para Deletar",
+                cnpj="99.999.999/0001-99",
+                ativo=True
+            )
+        
+            client.force_login(admin_user)
+          
+            url = reverse('empresa:excluir_empresa', args=[empresa_alvo.id])
+            response = client.post(url)
+    
+            assert response.status_code == 302
+            assert response.url == reverse('empresa:listar_empresas')
+
+        def test_view_excluir_empresa_protege_autenticacao(self, client):
+            url = reverse('empresa:excluir_empresa', args=[1]) # ID fictício
+            response = client.post(url)
+        
+            assert response.status_code == 302
+            assert 'login' in response.url

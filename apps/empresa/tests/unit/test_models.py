@@ -61,3 +61,28 @@ class TestEmpresaModel:
         assert "matriz" in excinf.value.message_dict
         assert excinf.value.message_dict["matriz"] == ["Matriz não pode ter outra matriz."]
 
+    def test_excluir_empresa_inativacao(self, empresa_teste):
+        id_empresa = empresa_teste.id
+
+        empresa_teste.delete()
+        empresa_banco = Empresa.objects.get(id=id_empresa)
+
+        assert Empresa.objects.count() == 1
+        assert empresa_banco.ativo is False
+        assert empresa_banco.razao_social == "I/O Solution LTDA"
+
+    def test_inativar_empresa_desativa_usuarios_vinculados(self, empresa_teste):
+        from apps.usuarios.models import Usuario
+        
+        usuario = Usuario.objects.create_user(
+            email="test_cascade@io.com",
+            nome="test_cascade",
+            password="123",
+            empresa=empresa_teste,
+            is_active=True
+        )
+
+        empresa_teste.delete()
+        usuario.refresh_from_db()
+
+        assert usuario.is_active is False
